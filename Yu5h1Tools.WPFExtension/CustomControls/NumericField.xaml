@@ -1,0 +1,20 @@
+﻿<UserControl x:Name="userControl" x:Class="Yu5h1Tools.WPFExtension.NumericField"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Yu5h1Tools.WPFExtension"
+             mc:Ignorable="d"  ClipToBounds="True" Cursor="Arrow" Foreground="#FF3A3A3A" Height="23" Width="150">
+    <UserControl.Resources>
+    </UserControl.Resources>
+    <Grid x:Name="grid" Margin="0,0,-0.396,0.287" RenderTransformOrigin="0.5,0.5" Cursor="Arrow">
+        <Viewbox x:Name="viewbox" HorizontalAlignment="Left" Height="{Binding ActualHeight, ElementName=userControl, Mode=OneWay}" Margin="0,0,0,-4" VerticalAlignment="Top" Width="{Binding ActualWidth, ElementName=userControl, Mode=OneWay}">
+            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Orientation="Horizontal">
+                <Label x:Name="label" Content="label" HorizontalAlignment="Left" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" MinHeight="16" Margin="0"/>
+                <TextBox x:Name="value_textbox" HorizontalAlignment="Left" Text="0" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5" Height="23" Width="89" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MinWidth="20" LostFocus="value_textbox_LostFocus" LostKeyboardFocus="value_textbox_LostKeyboardFocus" KeyDown="value_textbox_KeyDown" Padding="0" Margin="0,0,0,-0.188" TextChanged="value_textbox_TextChanged" PreviewTextInput="value_textbox_PreviewTextInput"/>
+                <ScrollBar x:Name="updown_btn" HorizontalAlignment="Left" Height="23" VerticalAlignment="Center" Width="32" Margin="0" ValueChanged="scrollBar_ValueChanged" Minimum="-1" SmallChange="1" MaxWidth="32" MaxHeight="26" MinHeight="20" MinWidth="16"/>
+            </StackPanel>
+        </Viewbox>
+
+    </Grid>
+</UserControl>
