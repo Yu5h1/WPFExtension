@@ -52,8 +52,8 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
         public void SelectItems(List<TreeViewItem> items) {
             foreach (var item in items) AppendToSelection(item);
         }
-        public void SelectAllChildren(TreeViewItem node,bool visible = false) {
-            SelectItems(GetAllChildren(node, visible));
+        public void SelectAllChildren(TreeViewItem node,bool IncludeUnExpanded = false) {
+            SelectItems(GetAllChildren(node, IncludeUnExpanded));
         }
         public void SelectAllChildren(object item)
         {
@@ -92,8 +92,6 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
                                 AppendToSelection(displayitems[i]);
                             }
                         }
-                        
-
                     }
                 }
 

@@ -63,6 +63,7 @@
     <Compile Include="Enums.cs" />
     <Compile Include="FrameworkElementEx.cs" />
     <Compile Include="ImageEx.cs" />
+    <Compile Include="InputEx.cs" />
     <Compile Include="MouseEventUtility.cs" />
     <Compile Include="CustomControls\NumericField.xaml.cs">
       <DependentUpon>NumericField.xaml</DependentUpon>

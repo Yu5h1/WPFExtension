@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.ComponentModel;
 using System.Windows;
@@ -27,12 +28,11 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
         }
 
         [Category("Common Properties")]
-        public string DropTypes { get; set; } = "";
-        public string[] DropTypesArray
-        {
-            get { return DropTypes.Split(','); }
-            set => DropTypes = string.Join(",", value: value);
-        }
+        public string FileFilter { get; set; } = "";
+        public string[] DropTypesArray { get { return GetTypesArray(FileFilter); } }
+
+
+
 
         public event TextChangedEventHandler TextChanged
         {
@@ -47,14 +47,13 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
             PreviewDragEnter += checkDragEvent;
             PreviewDragOver += checkDragEvent;
         }
-
         private void SelectDialog_btn_Click(object sender, RoutedEventArgs e)
         {
             // Configure open file dialog box
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            dlg.FileName = "Document"; // Default file name
-            dlg.DefaultExt = ".nif"; // Default file extension
-            dlg.Filter = "Nif File (.nif)|*.nif"; // Filter files by extension
+            //dlg.FileName = "Document"; // Default file name
+            //dlg.DefaultExt = ".nif"; // Default file extension
+            dlg.Filter = FileFilter;
 
             // Show open file dialog box
             Nullable<bool> result = dlg.ShowDialog();
@@ -66,7 +65,22 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
                 textBox.Text = dlg.FileName;
             }
         }
-
+        public static string[] GetTypesArray(string filters)
+        {
+            List<string> result = new List<string>();
+            foreach (var item in filters.Split('|', ';'))
+            {
+                if (item.StartsWith("*"))
+                {
+                    string curtype = item.Remove(0, 2).ToLower();
+                    if (!result.Contains(curtype) && curtype != "*")
+                    {
+                        result.Add(curtype);
+                    }
+                }
+            }
+            return result.ToArray();
+        }
         void checkDragEvent(object sender,DragEventArgs e)
         {
             var fileDrop = e.Data.GetData(DataFormats.FileDrop);
