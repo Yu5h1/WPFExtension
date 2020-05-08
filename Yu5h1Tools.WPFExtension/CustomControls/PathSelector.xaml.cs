@@ -13,13 +13,13 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
     /// </summary>
     public partial class PathSelector : UserControl
     {
-        [Category("Common Properties")]
+        [Category("PathSelector")]
         public string label
         {
             get { return label_lb.Content as string; }
             set { label_lb.Content = value; }
         }
-        [Category("Common Properties")]
+        [Category("PathSelector")]
         public string text
         {
             get { return textBox.Text; }
@@ -27,12 +27,10 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
             set { textBox.Text = value; }
         }
 
-        [Category("Common Properties")]
+        [Category("PathSelector")]
         public string FileFilter { get; set; } = "";
+
         public string[] DropTypesArray { get { return GetTypesArray(FileFilter); } }
-
-
-
 
         public event TextChangedEventHandler TextChanged
         {
@@ -51,8 +49,8 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
         {
             // Configure open file dialog box
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            //dlg.FileName = "Document"; // Default file name
-            //dlg.DefaultExt = ".nif"; // Default file extension
+            dlg.FileName = Path.GetFileName(textBox.Text);
+            //dlg.DefaultExt = ".???";
             dlg.Filter = FileFilter;
 
             // Show open file dialog box

@@ -94,6 +94,7 @@
     </Compile>
     <Compile Include="RectEx.cs" />
     <Compile Include="SizeEx.cs" />
+    <Compile Include="StringEx.cs" />
     <Compile Include="ThicknessEx.cs" />
     <Compile Include="UIElementCollectionEx.cs" />
     <Compile Include="CustomControls\VisualPoint.xaml.cs">

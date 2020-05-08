@@ -44,23 +44,6 @@ namespace Yu5h1Tools.WPFExtension
         {
             InitializeComponent();
         }
-        public static bool Match(string searchText, string target,bool ToLower = true)
-        {
-            if (searchText == "" || searchText == null) return true;
-            string[] searchTextDatas = searchText.Split('_', ' ');
-            for (int i = 0; i < searchTextDatas.Length; i++) {
-                if (ToLower)
-                {
-                    if (!target.ToLower().Contains(searchTextDatas[i].ToLower())) return false;
-                }
-                else {
-                    if (!target.Contains(searchTextDatas[i])) return false;
-                }
-            }
-                
-            return true;
-        }
-        
 
         private void textBox_TextChanged(object sender, TextChangedEventArgs e)
         {
