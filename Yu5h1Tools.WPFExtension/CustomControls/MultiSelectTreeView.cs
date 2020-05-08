@@ -35,28 +35,34 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
         {
             base.OnInitialized(e);
         }
-
-
         void AppendToSelection(TreeViewItem item) {
-            if (selectedNodes.Contains(item)) return;
-            item.Background = Brushes.SkyBlue;
+            if (item == null || selectedNodes.Contains(item)) return;
+            //if (item != selectedNode) {
+                //item.Foreground = Brushes.DarkGray;
+                item.Background = selectedNodes.Count == 0 ? Brushes.Orange : SystemColors.HighlightBrush;
+            //}
             selectedNodes.Add(item);
         }
         void AppendToSelection(object item) {
             if (item.GetType() != typeof(TreeViewItem)) return;
             AppendToSelection((TreeViewItem)item);
         }
-
+        void DeSelect(TreeViewItem item)
+        {
+            item.Background = Brushes.White;
+            item.IsSelected = false;
+            selectedNodes.Remove(item);
+        }
         public List<TreeViewItem> GetAllTreeViewItems(bool IncludeUnExpanded = false) {
             var result = new List<TreeViewItem>();
             foreach (var item in Items)
                 result.AddRange(GetAllChildren((TreeViewItem)item, IncludeUnExpanded));
             return result;
         }
-        public List<TreeViewItem> GetAllChildren(TreeViewItem node, bool IncludeUnExpanded = false )
+        public List<TreeViewItem> GetAllChildren(TreeViewItem node, bool IncludeUnExpanded = false ,bool containSelf = true)
         {
             List<TreeViewItem> result = new List<TreeViewItem>();
-            result.Add(node);
+            if (containSelf) result.Add(node);
             if (node.IsExpanded || IncludeUnExpanded )
             {
                 foreach (var item in node.Items)
@@ -79,7 +85,15 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
             if (item.GetType() != typeof(TreeViewItem)) return;
             SelectAllChildren((TreeViewItem)item);
         }
-
+        public void ClearSelectedNodes()
+        {
+            foreach (var item in selectedNodes) {
+                //item.Foreground = SystemColors.ControlTextBrush;
+                item.Background = Brushes.White;
+            } 
+            selectedNodes.Clear();
+            previouseSelected = null;
+        }
         TreeViewItem getRootItem(TreeViewItem item) {
             while (item.Parent.GetType() == typeof(TreeViewItem)) {
                 item = item.Parent as TreeViewItem;
@@ -92,11 +106,23 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
         }
         public void ShowItems(string filter,Func<TreeViewItem,string> getName) {
             var items = GetAllTreeViewItems(true);
+            if (filter == null || filter == string.Empty) {
+                foreach (var item in items) {
+                    getName(item);
+                    item.Visibility = Visibility.Visible;
+                }
+                return;
+            }
+
             List<TreeViewItem> visibleItems = new List<TreeViewItem>();
             foreach (var item in items)
             {
                 if (getName(item).Match(filter, StringComparison.Ordinal)) visibleItems.Add(item);
-                else item.Visibility = Visibility.Collapsed;
+                else {
+                    item.IsExpanded = false;
+                    item.Visibility = Visibility.Collapsed;
+                }
+                
             }
             foreach (var item in visibleItems)
             {
@@ -122,26 +148,29 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
         
         void CustomDoubleClickMouse(MouseButtonEventArgs e)
         {
-            if (e.ClickCount > 1)
+            if (e.ClickCount > 1 && selectedNode != null)
             {
-                var nodeChildren = GetAllChildren(selectedNode, true);
-                if (InputEx.KeysDown(Key.LeftCtrl, Key.LeftAlt))
-                {
+                var nodeChildren = GetAllChildren(selectedNode,true,!Key.LeftShift.IsPressed());
+                if (nodeChildren.Count > 0) {
                     if (e.ChangedButton == MouseButton.Left)
-                        SetTreeViewItemsIsExpended(nodeChildren, true);
-                    else if (e.ChangedButton == MouseButton.Right)
-                        SetTreeViewItemsIsExpended(nodeChildren, false);
-                }else {
-                    if (e.ChangedButton == MouseButton.Left)
-                        SelectAllChildren(selectedNode);
+                    {
+                        if (Key.LeftCtrl.IsPressed())
+                        {
+                            SelectAllChildren(selectedNode, true);
+                        }
+                        else
+                        {
+                            ClearSelectedNodes();
+                        }
+                        SetTreeViewItemsIsExpended(nodeChildren, !nodeChildren[0].IsExpanded);
+                    }
                 }
-                
-                e.Handled = true;
             }
         }
 
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
         {
+            previouseSelected = selectedNode;
             TreeViewItem treeViewItem = VisualUpwardSearch(e.OriginalSource as DependencyObject);
 
             if (treeViewItem != null)
@@ -153,8 +182,8 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
                 if (IsMouseInSelectedHeader)
                 {
                     if (selectedNode != null) CustomDoubleClickMouse(e);
+                    e.Handled = true;
                 }
-                e.Handled = true;
             }
             base.OnPreviewMouseLeftButtonDown(e);
         }
@@ -164,11 +193,12 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
 
             if (treeViewItem != null)
             {
-                treeViewItem.Focus();
-                //treeViewItem.IsSelected = true;
+                //treeViewItem.Focus();
+
+                DeSelect(treeViewItem);
                 if (e.ClickCount > 1) CustomDoubleClickMouse(e);
-                else CustomMouseDownEvent(e);
-                e.Handled = true;
+                //else CustomMouseDownEvent(e);
+                //e.Handled = true;
             }
             base.OnPreviewMouseRightButtonDown(e);
         }
@@ -184,12 +214,13 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
             if (!IsMouseInSelectedHeader) return;
             if (Keyboard.IsKeyDown(Key.LeftCtrl))
             {
-
+                AppendToSelection(previouseSelected);
             }
             else if (Keyboard.IsKeyDown(Key.LeftShift))
             {
                 if (previouseSelected != null)
                 {
+                    AppendToSelection(previouseSelected);
                     var displayitems = GetAllTreeViewItems();
                     int oldIndex = displayitems.IndexOf(previouseSelected);
                     int newIndex = displayitems.IndexOf(selectedNode);
@@ -204,21 +235,14 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
                             AppendToSelection(displayitems[i]);
                         }
                     }
+
                 }
             }
             else
             {
-                foreach (var item in selectedNodes)
-                {
-                    item.Background = Brushes.White;
-                }
-                selectedNodes.Clear();
+                ClearSelectedNodes();
             }
-            if (selectedNode != null)
-            {
-                selectedNode.Background = selectedNodes.Count == 0 ? Brushes.Orange : Brushes.SkyBlue;
-                AppendToSelection(selectedNode);
-            }
+            AppendToSelection(selectedNode);
         }
         protected override void OnKeyDown(KeyEventArgs e)
         {
