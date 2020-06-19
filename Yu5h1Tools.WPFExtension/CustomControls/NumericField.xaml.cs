@@ -224,7 +224,7 @@ namespace Yu5h1Tools.WPFExtension
         {
             
         }
-
+        
         private void value_textbox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             char chr = e.Text[0];
@@ -233,7 +233,7 @@ namespace Yu5h1Tools.WPFExtension
             {
                 e.Handled = true;
                 System.Media.SystemSounds.Beep.Play();
-            }
+            }            
         }
     }
 }

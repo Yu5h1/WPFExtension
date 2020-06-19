@@ -37,10 +37,8 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
         }
         void AppendToSelection(TreeViewItem item) {
             if (item == null || selectedNodes.Contains(item)) return;
-            //if (item != selectedNode) {
-                //item.Foreground = Brushes.DarkGray;
-                item.Background = selectedNodes.Count == 0 ? Brushes.Orange : SystemColors.HighlightBrush;
-            //}
+            //item.Foreground = Brushes.DarkGray;
+            item.Background = selectedNodes.Count == 0 ? Brushes.Orange : SystemColors.HighlightBrush;
             selectedNodes.Add(item);
         }
         void AppendToSelection(object item) {
@@ -161,8 +159,9 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
                         else
                         {
                             ClearSelectedNodes();
+                            SetTreeViewItemsIsExpended(nodeChildren, !nodeChildren[0].IsExpanded);
                         }
-                        SetTreeViewItemsIsExpended(nodeChildren, !nodeChildren[0].IsExpanded);
+                        
                     }
                 }
             }
@@ -170,9 +169,7 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
 
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
         {
-            previouseSelected = selectedNode;
             TreeViewItem treeViewItem = VisualUpwardSearch(e.OriginalSource as DependencyObject);
-
             if (treeViewItem != null)
             {
                 treeViewItem.IsSelected = true;
@@ -195,7 +192,7 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
             {
                 //treeViewItem.Focus();
 
-                DeSelect(treeViewItem);
+                //DeSelect(treeViewItem);
                 if (e.ClickCount > 1) CustomDoubleClickMouse(e);
                 //else CustomMouseDownEvent(e);
                 //e.Handled = true;
