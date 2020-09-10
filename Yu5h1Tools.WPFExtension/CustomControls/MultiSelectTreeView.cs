@@ -6,6 +6,8 @@ using System.Windows.Media;
 using System.Windows;
 using System.ComponentModel;
 using Yu5h1Tools.WPFExtension;
+using static InformationViewer;
+
 
 namespace Yu5h1Tools.WPFExtension.CustomControls
 {
@@ -13,6 +15,12 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
     {
         [Category("Custom Properties")]
         public bool EnableDeleteNode { get; set; }
+        //public event SelectionChangedEventHandler SelectionChanged
+        //{
+        //    add { SelectionChanged += value; }
+        //    remove { SelectionChanged -= value; }
+        //}
+
         public TreeViewItem selectedNode {
             get {
                 if (SelectedItem == null) return null;
@@ -23,21 +31,22 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
 
         TreeViewItem previouseSelected;
 
+
         bool IsMouseInSelectedHeader 
         {
             get {
-                if (selectedNode == null) return false;
+                if (selectedNode == null) return true;
+                if (selectedNode.Header.GetType() != typeof(FrameworkElement)) return true;
                 return ((FrameworkElement)selectedNode.Header).GetBounds(this).Contains(Mouse.GetPosition(this));
             }
-        }
-
+        }        
         protected override void OnInitialized(EventArgs e)
         {
             base.OnInitialized(e);
         }
         void AppendToSelection(TreeViewItem item) {
             if (item == null || selectedNodes.Contains(item)) return;
-            //item.Foreground = Brushes.DarkGray;
+            //item.Foreground = Brushes.DarkGray;            
             item.Background = selectedNodes.Count == 0 ? Brushes.Orange : SystemColors.HighlightBrush;
             selectedNodes.Add(item);
         }
@@ -83,6 +92,7 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
             if (item.GetType() != typeof(TreeViewItem)) return;
             SelectAllChildren((TreeViewItem)item);
         }
+ 
         public void ClearSelectedNodes()
         {
             foreach (var item in selectedNodes) {
@@ -187,15 +197,10 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
         protected override void OnPreviewMouseRightButtonDown(MouseButtonEventArgs e)
         {
             TreeViewItem treeViewItem = VisualUpwardSearch(e.OriginalSource as DependencyObject);
-
             if (treeViewItem != null)
             {
-                //treeViewItem.Focus();
-
-                //DeSelect(treeViewItem);
-                if (e.ClickCount > 1) CustomDoubleClickMouse(e);
-                //else CustomMouseDownEvent(e);
-                //e.Handled = true;
+                treeViewItem.IsSelected = true;
+                CustomMouseDownEvent(e);
             }
             base.OnPreviewMouseRightButtonDown(e);
         }
@@ -208,9 +213,14 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
         }
         void CustomMouseDownEvent(MouseButtonEventArgs e)
         {
-            if (!IsMouseInSelectedHeader) return;
+
+            if (!IsMouseInSelectedHeader) {
+                previouseSelected?.Focus();
+                return;
+            }
+            
             if (Keyboard.IsKeyDown(Key.LeftCtrl))
-            {
+            {                
                 AppendToSelection(previouseSelected);
             }
             else if (Keyboard.IsKeyDown(Key.LeftShift))
@@ -235,10 +245,7 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
 
                 }
             }
-            else
-            {
-                ClearSelectedNodes();
-            }
+            else ClearSelectedNodes();
             AppendToSelection(selectedNode);
         }
         protected override void OnKeyDown(KeyEventArgs e)
@@ -248,9 +255,10 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
                 var parent = ((ItemsControl)SelectedItem).Parent as ItemsControl;
                 parent.Items.Remove(SelectedItem);
             }
+            
             base.OnKeyDown(e);
         }
-        
+
         #endregion
     }
 }

@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 
-
 namespace Yu5h1Tools.WPFExtension.CustomControls
 {
     /// <summary>
@@ -19,16 +18,24 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
             get { return label_lb.Content as string; }
             set { label_lb.Content = value; }
         }
+        /// <summary>
+        /// Image files (*.png;*.jpg;*.gif;*.jpeg)|*.png;*.jpg;*.gif;*.jpeg|All files (*.*)|*.*
+        /// </summary>
         [Category("PathSelector")]
-        public string text
+        public string Text
         {
             get { return textBox.Text; }
 
-            set { textBox.Text = value; }
+            set { textBox.Text = DisplayFileNameOnly ? Path.GetFileName(value) : value; }
         }
+        [Category("PathSelector")]
+        public bool DisplayFileNameOnly { get; set; } = false;
 
         [Category("PathSelector")]
-        public string FileFilter { get; set; } = "";
+        public string FileFilter { get; set; } = "Image files (*.png;*.jpg;*.gif;*.jpeg)|*.png;*.jpg;*.gif;*.jpeg|All files (*.*)|*.*";
+
+        [Category("PathSelector")]
+        public string InitialDirectory { get; set; }
 
         public string[] DropTypesArray { get { return GetTypesArray(FileFilter); } }
 
@@ -49,8 +56,9 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
         {
             // Configure open file dialog box
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            if (!string.Empty.Equals(InitialDirectory)) dlg.InitialDirectory = InitialDirectory;            
+            
             dlg.FileName = Path.GetFileName(textBox.Text);
-            //dlg.DefaultExt = ".???";
             dlg.Filter = FileFilter;
 
             // Show open file dialog box
@@ -108,13 +116,13 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             if (IsFileTypeMatchWith(files[0], DropTypesArray))
             {
-                text = files[0];
+                Text = files[0];
             }
         }
 
         private void Label_lb_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            Explorer(text);
+            Explorer(Text);
         }
         void Explorer(string path)
         {

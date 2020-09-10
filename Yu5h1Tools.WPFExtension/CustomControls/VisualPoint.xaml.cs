@@ -19,7 +19,7 @@ namespace Yu5h1Tools.WPFExtension
     /// </summary>
     public partial class VisualPoint : UserControl
     {
-        public enum Style {
+        public enum VisualStyle {
             Default,
             CrossLine,
             Square

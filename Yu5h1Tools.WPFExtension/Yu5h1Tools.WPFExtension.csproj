@@ -62,6 +62,7 @@
     <Compile Include="Enums.cs" />
     <Compile Include="FrameworkElementEx.cs" />
     <Compile Include="ImageEx.cs" />
+    <Compile Include="InformationViewer.cs" />
     <Compile Include="InputEx.cs" />
     <Compile Include="MouseEventUtility.cs" />
     <Compile Include="CustomControls\NumericField.xaml.cs">
@@ -96,6 +97,9 @@
     <Compile Include="StringEx.cs" />
     <Compile Include="TextblockEx.cs" />
     <Compile Include="ThicknessEx.cs" />
+    <Compile Include="ThreadingEx.cs" />
+    <Compile Include="Timer.cs" />
+    <Compile Include="TreeViewItemEx.cs" />
     <Compile Include="UIElementCollectionEx.cs" />
     <Compile Include="CustomControls\VisualPoint.xaml.cs">
       <DependentUpon>VisualPoint.xaml</DependentUpon>
@@ -114,6 +118,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Themes\CustomStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="CustomControls\NumericField.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

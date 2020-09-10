@@ -41,8 +41,7 @@ namespace Yu5h1Tools.WPFExtension
         public double value {
             get
             {
-                double result = 0;
-                double.TryParse(value_textbox.Text, out result);
+                double.TryParse(value_textbox.Text, out double result);
                 return result;
             }
             set
@@ -125,8 +124,7 @@ namespace Yu5h1Tools.WPFExtension
         }
         bool IsDigits(string txt)
         {
-            double val = 0;
-            return double.TryParse(txt,out val);
+            return double.TryParse(txt,out double val);
         }
         private void OnHeaderChanged()
         {
@@ -162,7 +160,7 @@ namespace Yu5h1Tools.WPFExtension
                     value_textbox.CaretIndex = value_textbox.Text.Length;
                 }
             }
-            catch (Exception excp)
+            catch (Exception)
             {
                 if (previouseValue == 0) value_textbox.Text = "0";
                 else value_textbox.Text = previouseValue.ToString(ValueFormat);
