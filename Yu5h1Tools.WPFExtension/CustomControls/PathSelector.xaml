@@ -7,7 +7,7 @@
              mc:Ignorable="d" Background="White" MinHeight="23" Width="160" Height="23">
     <Grid>
         <Label x:Name="label_lb" Content="Label" VerticalAlignment="Center" Margin="0,0,118.683,0" Padding="0" VerticalContentAlignment="Center"/>
-        <TextBox x:Name="textBox" VerticalAlignment="Center" Margin="41,1,27.683,1.812"/>
+        <TextBox x:Name="textBox" VerticalAlignment="Center" Margin="41,1,27.683,1.812" AllowDrop="False"/>
         <Button x:Name="SelectDialog_btn" Content="..." HorizontalAlignment="Right" VerticalAlignment="Center" Width="23" Height="23" MinHeight="23" MinWidth="23" MaxWidth="25" MaxHeight="25" HorizontalContentAlignment="Center" Click="SelectDialog_btn_Click"/>
     </Grid>
 </UserControl>

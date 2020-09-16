@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Yu5h1Tools.WPFExtension.CustomControls
 {
@@ -48,9 +50,15 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
         public PathSelector()
         {
             InitializeComponent();
-            Drop += TextBox_Drop;
-            PreviewDragEnter += checkDragEvent;
-            PreviewDragOver += checkDragEvent;
+            textBox.HandleDragDrop(files => {
+                if (files[0].IsFileTypeMatches(DropTypesArray)) Text = files[0];
+            }, DropTypesArray);
+            textBox.KeyDown += (s, e) => {
+                if (e.Key == Key.Escape) {
+                    textBox.Text = "";
+                    Keyboard.ClearFocus();
+                }
+            };
         }
         private void SelectDialog_btn_Click(object sender, RoutedEventArgs e)
         {
@@ -73,54 +81,14 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
         }
         public static string[] GetTypesArray(string filters)
         {
-            List<string> result = new List<string>();
-            foreach (var item in filters.Split('|', ';'))
-            {
-                if (item.StartsWith("*"))
-                {
-                    string curtype = item.Remove(0, 2).ToLower();
-                    if (!result.Contains(curtype) && curtype != "*")
-                    {
-                        result.Add(curtype);
-                    }
-                }
-            }
-            return result.ToArray();
+            List<string> filterList = filters.Split('|').Where( d => d.Contains("*") &&
+                                                                !d.Contains("(") &&
+                                                                !d.Contains("*.*")).
+                                                                Select(d => d.Replace("*", "")).
+                                                                Join().Split(';').ToList();
+            return filterList.ToArray();
         }
-        void checkDragEvent(object sender,DragEventArgs e)
-        {
-            var fileDrop = e.Data.GetData(DataFormats.FileDrop);
-            if (fileDrop == null) return;
-            //e.Effects = DragDropEffects.Move;
-            string[] files = (string[])fileDrop;
-            if (files.Length == 1)
-            {
-                foreach (var type in DropTypesArray)
-                {
-                    if (type == "folder" || type == "directory")
-                    {
-                        if (File.GetAttributes(files[0]) == FileAttributes.Directory)
-                        {
-                            e.Handled = true;
-                        }
-                    }
-                }
-                if (IsFileTypeMatchWith(files[0], DropTypesArray))
-                {
-                    e.Handled = true;
-                }
-            }
-        }
-        private void TextBox_Drop(object sender, DragEventArgs e)
-        {
-            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            if (IsFileTypeMatchWith(files[0], DropTypesArray))
-            {
-                Text = files[0];
-            }
-        }
-
-        private void Label_lb_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void Label_lb_MouseUp(object sender, MouseButtonEventArgs e)
         {
             Explorer(Text);
         }
@@ -138,20 +106,6 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
                 string description = path == string.Empty ? "Empty Path ! " : path + " \n does not exist ! ";
                 MessageBox.Show(description, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-        }
-        public static bool IsFileTypeMatchWith(string path, params string[] types)
-        {
-            //if (!System.Uri.IsWellFormedUriString(path,System.UriKind.Absolute)) {
-            //    return false;
-            //}
-            string ext = Path.GetExtension(path).ToLower();
-            foreach (var t in types)
-            {
-                string CONDITION = t.ToLower();
-                if (!t.StartsWith(".")) CONDITION = "." + CONDITION;
-                if (ext == CONDITION) return true;
-            }
-            return false;
         }
     }
 }

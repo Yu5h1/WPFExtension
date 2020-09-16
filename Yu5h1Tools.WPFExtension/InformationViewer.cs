@@ -76,20 +76,27 @@ public static class InformationViewer
 #endif
 
     }
-    public static bool IsFileLockedPrompt(string path)
+    public static bool IsFileNotLockedPrompt(string path)
+    {
+        var e = IsFileNotLocked(path);
+        if (e == null) return true;
+        e.PromptWarnning();
+        return false;
+    }
+    public static Exception IsFileNotLocked(string path)
     {
         try
         {
-            using (var stream = File.Open(path,FileMode.Open, FileAccess.Read, FileShare.None))
+            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.None))
             {
                 stream.Close();
             }
         }
-        catch (Exception e) {
-            e.PromptWarnning();
-            return true;
+        catch (Exception e)
+        {
+            return e;
         }
-        return false;
+        return null;
     }
 }
 

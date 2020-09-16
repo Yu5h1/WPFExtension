@@ -1,4 +1,7 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -16,6 +19,13 @@ namespace Yu5h1Tools.WPFExtension
             if (refrom == null) refrom = target.Parent as Visual;
             return target.TransformToVisual(refrom).TransformBounds(LayoutInformation.GetLayoutSlot(target));
         }
-
+        public static MenuItem AddContextMenuItem(this FrameworkElement target, string itemName, Action<object, RoutedEventArgs> click)
+        {
+            var item = new MenuItem() { Header = itemName };
+            if (click != null) item.Click += new RoutedEventHandler(click);
+            if (target.ContextMenu == null) target.ContextMenu = new ContextMenu();
+            target.ContextMenu.Items.Add(item);
+            return item;
+        }
     }
 }

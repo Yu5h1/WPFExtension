@@ -64,10 +64,13 @@
     <Compile Include="ImageEx.cs" />
     <Compile Include="InformationViewer.cs" />
     <Compile Include="InputEx.cs" />
+    <Compile Include="ItemCollectionEx.cs" />
+    <Compile Include="ItemsControlEx.cs" />
     <Compile Include="MouseEventUtility.cs" />
     <Compile Include="CustomControls\NumericField.xaml.cs">
       <DependentUpon>NumericField.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ProcessUtil.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -104,6 +107,8 @@
     <Compile Include="CustomControls\VisualPoint.xaml.cs">
       <DependentUpon>VisualPoint.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UIElementEx.cs" />
+    <Compile Include="WaitCursorProcess.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

@@ -13,8 +13,9 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
 {
     public class MultiSelectTreeView : TreeView
     {
+        public List<object> DeleteIgnoreList = new List<object>();
         [Category("Custom Properties")]
-        public bool EnableDeleteNode { get; set; }
+        public bool AllowDeleteNode { get; set; }
         //public event SelectionChangedEventHandler SelectionChanged
         //{
         //    add { SelectionChanged += value; }
@@ -93,7 +94,7 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
             SelectAllChildren((TreeViewItem)item);
         }
  
-        public void ClearSelectedNodes()
+        public void ClearSelection()
         {
             foreach (var item in selectedNodes) {
                 //item.Foreground = SystemColors.ControlTextBrush;
@@ -168,7 +169,7 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
                         }
                         else
                         {
-                            ClearSelectedNodes();
+                            ClearSelection();
                             SetTreeViewItemsIsExpended(nodeChildren, !nodeChildren[0].IsExpanded);
                         }
                         
@@ -245,15 +246,22 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
 
                 }
             }
-            else ClearSelectedNodes();
+            else ClearSelection();
             AppendToSelection(selectedNode);
         }
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            if (e.Key == Key.Delete && EnableDeleteNode)
+            if (e.Key == Key.Delete && AllowDeleteNode)
             {
-                var parent = ((ItemsControl)SelectedItem).Parent as ItemsControl;
-                parent.Items.Remove(SelectedItem);
+                var nodes = new List<TreeViewItem>(selectedNodes);
+                foreach (var item in nodes)
+                {
+                    if (!DeleteIgnoreList.Contains(item)) {
+                        var parent = (ItemsControl)item.Parent;
+                        parent.Items.Remove(item);
+                    }
+                }
+                ClearSelection();
             }
             
             base.OnKeyDown(e);
