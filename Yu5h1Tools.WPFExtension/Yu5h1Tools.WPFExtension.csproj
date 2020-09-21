@@ -31,8 +31,9 @@
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>3</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -52,8 +53,15 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ContextMenuEx.cs" />
     <Compile Include="ControlEx.cs" />
     <Compile Include="CursorEx.cs" />
+    <Compile Include="CustomControls\AautocompleteComboBox.xaml.cs">
+      <DependentUpon>AautocompleteComboBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\AdvancedTreeView.xaml.cs">
+      <DependentUpon>AdvancedTreeView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="CustomControls\MultiSelectTreeView.cs" />
     <Compile Include="CustomControls\PathSelector.xaml.cs">
       <DependentUpon>PathSelector.xaml</DependentUpon>
@@ -66,10 +74,12 @@
     <Compile Include="InputEx.cs" />
     <Compile Include="ItemCollectionEx.cs" />
     <Compile Include="ItemsControlEx.cs" />
+    <Compile Include="MenuItemEx.cs" />
     <Compile Include="MouseEventUtility.cs" />
     <Compile Include="CustomControls\NumericField.xaml.cs">
       <DependentUpon>NumericField.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PathInfo.cs" />
     <Compile Include="ProcessUtil.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -102,7 +112,6 @@
     <Compile Include="ThicknessEx.cs" />
     <Compile Include="ThreadingEx.cs" />
     <Compile Include="Timer.cs" />
-    <Compile Include="TreeViewItemEx.cs" />
     <Compile Include="UIElementCollectionEx.cs" />
     <Compile Include="CustomControls\VisualPoint.xaml.cs">
       <DependentUpon>VisualPoint.xaml</DependentUpon>
@@ -123,7 +132,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Themes\CustomStyles.xaml">
+    <Page Include="CustomControls\AautocompleteComboBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CustomControls\AdvancedTreeView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -146,6 +159,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\numericArror.cur" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Themes\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

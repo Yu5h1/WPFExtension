@@ -16,11 +16,6 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
         public List<object> DeleteIgnoreList = new List<object>();
         [Category("Custom Properties")]
         public bool AllowDeleteNode { get; set; }
-        //public event SelectionChangedEventHandler SelectionChanged
-        //{
-        //    add { SelectionChanged += value; }
-        //    remove { SelectionChanged -= value; }
-        //}
 
         public TreeViewItem selectedNode {
             get {

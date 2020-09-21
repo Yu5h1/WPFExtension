@@ -30,5 +30,14 @@ namespace Yu5h1Tools.WPFExtension
             return false;
         }
         public static string Join(this IEnumerable<string> strings,string separator = "") => string.Join(separator, strings);
+        public static string RemoveSuffixFrom(this string txt, params string[] filter)
+        {
+            foreach (var item in filter)
+            {
+                var lastIndexOf = txt.LastIndexOf(item);
+                if (lastIndexOf > -1) txt = txt.Remove(lastIndexOf);
+            }
+            return txt;
+        }
     }
 }

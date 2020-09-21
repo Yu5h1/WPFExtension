@@ -50,16 +50,7 @@ public static class InformationViewer
     {
         PromptInfos(string.Join<object>("\n", obj));
     }
-    public static bool PromptWarnning(this bool val,string content)
-    {
-        if (val) PromptWarnning(content);
-        return val;
-    }
-    public static void PromptWarnning(this Exception e)
-    {
-        PromptWarnning(e.Message);
-    }
-    public static void PromptWarnning(object content)
+    public static void PromptWarnning(this object content)
     {
 #if WPF
         MessageBox.Show(content.ToStringNullCheck(), "Warnning", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -74,29 +65,13 @@ public static class InformationViewer
 #else
         MessageBox.Show(content.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 #endif
-
     }
-    public static bool IsFileNotLockedPrompt(string path)
+    public static bool IsFileNotLockedElsePrompt(string path)
     {
-        var e = IsFileNotLocked(path);
+        var e = PathInfo.GetFileLockedException(path);
         if (e == null) return true;
         e.PromptWarnning();
         return false;
-    }
-    public static Exception IsFileNotLocked(string path)
-    {
-        try
-        {
-            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.None))
-            {
-                stream.Close();
-            }
-        }
-        catch (Exception e)
-        {
-            return e;
-        }
-        return null;
     }
 }
 

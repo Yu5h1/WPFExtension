@@ -19,13 +19,18 @@ namespace Yu5h1Tools.WPFExtension
             if (refrom == null) refrom = target.Parent as Visual;
             return target.TransformToVisual(refrom).TransformBounds(LayoutInformation.GetLayoutSlot(target));
         }
-        public static MenuItem AddContextMenuItem(this FrameworkElement target, string itemName, Action<object, RoutedEventArgs> click)
+        public static MenuItem AddMenuItem(this FrameworkElement target, string itemName)
         {
-            var item = new MenuItem() { Header = itemName };
-            if (click != null) item.Click += new RoutedEventHandler(click);
+            switch (target)
+            {
+                case MenuItem menuItem:
+                    var curResult = new MenuItem() { Header = itemName };
+                    menuItem.Items.Add(curResult);
+                    return curResult;
+            }
             if (target.ContextMenu == null) target.ContextMenu = new ContextMenu();
-            target.ContextMenu.Items.Add(item);
-            return item;
+            var result = target.ContextMenu.AddMenuItem(itemName);
+            return result;
         }
     }
 }
