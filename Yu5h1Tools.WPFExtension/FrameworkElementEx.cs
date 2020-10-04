@@ -21,14 +21,15 @@ namespace Yu5h1Tools.WPFExtension
         }
         public static MenuItem AddMenuItem(this FrameworkElement target, string itemName,string inputGestureText = "")
         {
-            if (target is MenuItem)
+            switch (target)
             {
+                case MenuItem menuItem:
                     var curResult = new MenuItem() { Header = itemName };
-                ((MenuItem)target).Items.Add(curResult);
+                    menuItem.Items.Add(curResult);
+                    return curResult;
             }
             if (target.ContextMenu == null) target.ContextMenu = new ContextMenu();
-            var result = target.ContextMenu.AddMenuItem(itemName, inputGestureText);
-            return result;
+            return target.ContextMenu.AddMenuItem(itemName, inputGestureText);
         }
     }
 }

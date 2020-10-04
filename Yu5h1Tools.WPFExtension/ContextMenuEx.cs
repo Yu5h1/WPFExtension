@@ -10,7 +10,7 @@ namespace Yu5h1Tools.WPFExtension
         public static MenuItem AddMenuItem(this ContextMenu contextMenu,string itemName,string inputGestureText = "")
         {
             var exists = contextMenu.Find(itemName);
-            if (exists != null) return exists as MenuItem;
+            if (exists != null) return exists as MenuItem;            
             return MenuItemEx.Create(contextMenu, itemName,  inputGestureText);
         }
     }

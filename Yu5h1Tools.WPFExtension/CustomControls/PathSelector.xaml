@@ -12,6 +12,6 @@
         </Grid.ColumnDefinitions>
         <Label x:Name="label_lb" Content="Label" VerticalAlignment="Center" Margin="0,3,3.574,3.812" Padding="0" VerticalContentAlignment="Center" Height="16"/>
         <TextBox x:Name="autoCompleteBox" Margin="1.426,0,27.683,-0.188" AllowDrop="True" Grid.Column="1" VerticalContentAlignment="Center"/>
-        <Button x:Name="SelectDialog_btn" Content="..." HorizontalAlignment="Right" VerticalAlignment="Center" Width="23" Height="23" MinHeight="23" MinWidth="23" MaxWidth="25" MaxHeight="25" HorizontalContentAlignment="Center" Grid.Column="1" Margin="0,0,-0.317,-0.188" PreviewMouseUp="SelectDialog_btn_PreviewMouseUp"/>
+        <Button x:Name="SelectDialog_btn" Content="..." HorizontalAlignment="Right" VerticalAlignment="Center" Width="23" Height="23" MinHeight="23" MinWidth="23" MaxWidth="25" MaxHeight="25" HorizontalContentAlignment="Center" Grid.Column="1" Margin="0,0,-0.317,-0.188" PreviewMouseUp="SelectDialog_btn_PreviewMouseUp" ToolTip="Right Click : Show in Explorer"/>
     </Grid>
 </UserControl>
