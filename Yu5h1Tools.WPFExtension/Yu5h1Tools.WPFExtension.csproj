@@ -56,8 +56,8 @@
     <Compile Include="ContextMenuEx.cs" />
     <Compile Include="ControlEx.cs" />
     <Compile Include="CursorEx.cs" />
-    <Compile Include="CustomControls\AautocompleteComboBox.xaml.cs">
-      <DependentUpon>AautocompleteComboBox.xaml</DependentUpon>
+    <Compile Include="CustomControls\AutocompleteComboBox.xaml.cs">
+      <DependentUpon>AutocompleteComboBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="CustomControls\AdvancedTreeView.xaml.cs">
       <DependentUpon>AdvancedTreeView.xaml</DependentUpon>
@@ -79,6 +79,7 @@
     <Compile Include="CustomControls\NumericField.xaml.cs">
       <DependentUpon>NumericField.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PanelEx.cs" />
     <Compile Include="PathInfo.cs" />
     <Compile Include="ProcessUtil.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -118,6 +119,7 @@
     </Compile>
     <Compile Include="UIElementEx.cs" />
     <Compile Include="WaitCursorProcess.cs" />
+    <Compile Include="Win32Util.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -132,7 +134,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="CustomControls\AautocompleteComboBox.xaml">
+    <Page Include="CustomControls\AutocompleteComboBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

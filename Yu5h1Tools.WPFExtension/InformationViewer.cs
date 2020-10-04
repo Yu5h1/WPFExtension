@@ -68,9 +68,18 @@ public static class InformationViewer
     }
     public static bool IsFileNotLockedElsePrompt(string path)
     {
-        var e = PathInfo.GetFileLockedException(path);
+        var e = PathInfo.GetPathLockedException(path);
         if (e == null) return true;
-        e.PromptWarnning();
+        e.Message.PromptWarnning();
+        return false;
+    }
+    public static bool IsFileLockedPrompt(string path)
+    {
+        var e = PathInfo.GetPathLockedException(path);
+        if (e != null) {
+            e.Message.PromptWarnning();
+            return true;
+        }
         return false;
     }
 }

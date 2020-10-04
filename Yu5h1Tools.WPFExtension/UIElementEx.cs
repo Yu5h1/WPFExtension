@@ -2,19 +2,29 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace Yu5h1Tools.WPFExtension
 {
     public static class UIElementEx
     {
-        public static void HandleDragDrop(this UIElement target,Action<string[]> dropHandle, params string[] filters)
+        private static readonly Action<UIElement> RefreshElement = ui =>
         {
-            target.AllowDrop = true;
-            var CheckDrag = new DragEventHandler((sender, e) =>
+            ui.UpdateLayout();
+            ui.InvalidateVisual();
+        };
+        public static void Refresh(this UIElement uiElement)
+        {
+            uiElement.Dispatcher.Invoke(DispatcherPriority.Render, new Action(() => RefreshElement(uiElement)));
+            uiElement.UpdateLayout();
+            uiElement.InvalidateVisual();
+        }
+        public static DragEventHandler CheckDrag(string[] filters)
+        {
+            return new DragEventHandler((sender, e) =>
             {
                 var fileDrop = e.Data.GetData(DataFormats.FileDrop);
                 if (fileDrop == null) return;
-                //e.Effects = DragDropEffects.Move;
                 string[] files = (string[])fileDrop;
                 if (files.Length == 1)
                 {
@@ -22,22 +32,19 @@ namespace Yu5h1Tools.WPFExtension
                     {
                         if (type.ToLower() == "folder" || type.ToLower() == "directory")
                         {
-                            if (File.GetAttributes(files[0]) == FileAttributes.Directory)
-                            {
-                                e.Handled = true;
-                            }
+                            if (File.GetAttributes(files[0]).HasFlag(FileAttributes.Directory)) e.Handled = true;
                         }
                     }
-                    if (files[0].IsFileTypeMatches(filters))
-                    {
-                        e.Handled = true;
-                    }
+                    if (files[0].IsFileTypeHasAny(filters)) e.Handled = true;
                 }
             });
-            target.PreviewDragEnter += CheckDrag;
-            target.PreviewDragOver += CheckDrag;
-            target.Drop += new DragEventHandler((s,e)=> dropHandle((string[])e.Data.GetData(DataFormats.FileDrop)));
         }
+        public static void HandleDragDrop(this UIElement target,Action<string[]> dropHandle, params string[] filters)
+        {
+            target.AllowDrop = true;
+            target.PreviewDragOver += CheckDrag(filters);
+            target.Drop += new DragEventHandler((s, e) => dropHandle((string[])e.Data.GetData(DataFormats.FileDrop)));
+        }  
         internal static bool DisplayTextEquals(this object target, string txt,
     StringComparison stringComparison = StringComparison.OrdinalIgnoreCase)
         {

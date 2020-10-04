@@ -20,6 +20,10 @@ public static class ProcessUtil
             (exe + " does not exists.").PromptWarnning();
             return false;
         }
+        if (args.Length == 0 && exited == null) {
+            Process.Start(exe);
+            return true;
+        }
         string argsLine = argsToLine(args);
         Process p = new Process();
         if (exited != null)
@@ -50,7 +54,7 @@ public static class ProcessUtil
         proc.WaitForExit();
         return proc.StandardOutput.ReadToEnd();
     }
-    public static bool ShowInExplorer(this string path)
+    public static bool ShowInExplorer(this string path,bool showNotExistsPrompt = true)
     {
         if (path != string.Empty)
         {
@@ -62,8 +66,7 @@ public static class ProcessUtil
 
                 return true;
             }
-            else (path + "\ndoes not exists !").PromptWarnning();
-
+            else if(showNotExistsPrompt) (path + "\ndoes not exists !").PromptWarnning();
         }
         else "empty path".PromptWarnning();
         return false;

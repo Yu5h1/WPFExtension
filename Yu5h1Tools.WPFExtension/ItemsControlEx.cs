@@ -51,15 +51,27 @@ namespace Yu5h1Tools.WPFExtension
                 VerticalAlignment = VerticalAlignment.Center,
             });
         }
-        public static void SetTitleControl<T>(this HeaderedItemsControl item, object title, T control = null) where T : UIElement, new()
-            => item.Header = CreateMixControls(title, control == null ? new T() : control);
-        public static void SetTitleControl<T>(this ContentControl item, object title, T control = null) where T : UIElement, new()
-            => item.Content = CreateMixControls(title, control == null ? new T() : control);
-
-
-        static TextBox GetNameField(this Control item, string name, double fieldWidth = 0)
+        public static O SetControlWithLabel<O, T>(this O item, object title, T control = null,bool LabelRightSide = false)
+                                                where T : UIElement, new()
+                                                where O : Control
         {
-            var tb = new TextBox()
+            var panel = CreateMixControls(title, control == null ? new T() : control);
+            if (LabelRightSide) panel.Switch(0, 1);
+            switch (item)
+            {
+                case HeaderedItemsControl headeredItemsControl:
+                    
+                    headeredItemsControl.Header = panel;
+                    break;
+                case ContentControl headeredItemsControl:
+                    headeredItemsControl.Content = panel;
+                    break;
+            }
+            return item;
+        }
+        static TextBox GetNameField(this Control item, string name,bool allowEmpty, Action<TextBox> OnconfirmModify, double fieldWidth = 0)
+        {
+            var field = new TextBox()
             {
                 Background = null,
                 BorderBrush = null,
@@ -69,54 +81,60 @@ namespace Yu5h1Tools.WPFExtension
                 Width = fieldWidth == 0 ? item.Width : fieldWidth,
                 HorizontalAlignment = HorizontalAlignment.Stretch
             };
-            Action<TextBox, bool> confirmModify = (textBox, cancel) => {
-                if (cancel)
-                {
-
-                }
-                textBox.Background = null;
-                textBox.Focusable = false;
-                textBox.IsHitTestVisible = false;
+            Action<TextBox, bool> confirmModify = (tb, cancel) => {
+                if (cancel || (!allowEmpty && tb.Text.Equals(string.Empty)))
+                    tb.Text = tb.Tag as string;
+                else OnconfirmModify(tb);
+                tb.Background = null;
+                tb.Focusable = false;
+                tb.IsHitTestVisible = false;
+                
             };
 
-            tb.KeyDown += (s, e) =>
+            field.KeyDown += (s, e) =>
             {
                 if (e.Key == Key.Escape) confirmModify((TextBox)s, true);
                 if (e.Key == Key.Enter) confirmModify((TextBox)s, false);
             };
-            tb.LostFocus += (s, e) => confirmModify((TextBox)s, false);
+            field.LostFocus += (s, e) => confirmModify((TextBox)s, false);
             item.KeyDown += (s, e) => {
                 if (e.Key == Key.F2)
                 {
-                    tb.IsHitTestVisible = true;
-                    tb.Focusable = true;
-                    tb.Focus();
-                    tb.Background = Brushes.White;
-                    tb.SelectAll();
+                    field.Tag = field.Text;
+                    field.IsHitTestVisible = true;
+                    field.Focusable = true;
+                    field.Focus();
+                    field.Background = Brushes.White;
+                    field.SelectAll();
                 }
             };
             item.HorizontalAlignment = HorizontalAlignment.Stretch;
-            return tb;
+            return field;
         }
-        public static TreeViewItem SetNameField(this TreeViewItem treeItem, object name, double fieldWidth = 0)
+        public static TreeViewItem SetNameField(this TreeViewItem treeItem, object name,bool allowEmpty, Action<TextBox> OnconfirmModify, double fieldWidth = 0)
         {
-            treeItem.Header = GetNameField(treeItem, name.ToString(), fieldWidth);
+            treeItem.Header = GetNameField(treeItem, name.ToString(), allowEmpty, OnconfirmModify, fieldWidth);
             return treeItem;
         }
-        public static TreeViewItem AddNameField(this TreeViewItem treeItem, object name, double fieldWidth = 0)
+        public static TreeViewItem AddNameField(this TreeViewItem treeItem, object name, bool allowEmpty, Action<TextBox> OnconfirmModify, double fieldWidth = 0)
         {
-            var result = new TreeViewItem().SetNameField(name, fieldWidth);
+            var result = new TreeViewItem().SetNameField(name, allowEmpty, OnconfirmModify, fieldWidth);
             treeItem.Items.Add(result);
             return result;
         }
-        public static ListBoxItem SetNameField(this ListBoxItem listboxItem, object name, double fieldWidth = 0)
+        public static ListBoxItem SetNameField(this ListBoxItem listboxItem, object name,bool allowEmpty, Action<TextBox> OnconfirmModify, double fieldWidth = 0)
         {
-            listboxItem.Content = GetNameField(listboxItem, name.ToString(), fieldWidth);
+            listboxItem.Content = GetNameField(listboxItem, name.ToString(), allowEmpty, OnconfirmModify, fieldWidth);
             return listboxItem;
         }
         public static TreeViewItem SetField(this TreeViewItem treeItem, object title, object value, double labelWidth = 50, double fieldWidth = 0)
         {
             treeItem.Header = GetField(title, value, labelWidth, fieldWidth);
+            treeItem.KeyDown += (s, e) =>
+            {
+                if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && e.Key == Key.C)
+                    Clipboard.SetText(treeItem.GetMixControl<TextBlock>(0).Text);
+            };
             return treeItem;
         }
         public static TreeViewItem AddField(this TreeViewItem treeItem, object title, object value, double labelWidth = 50, double fieldWidth = 0)
@@ -128,7 +146,7 @@ namespace Yu5h1Tools.WPFExtension
         public static TreeViewItem AddTitleControl<T>(this TreeViewItem treeItem, object title,T item = null)  where T : UIElement,new()
         {
             var result = new TreeViewItem();
-            result.SetTitleControl(title, item);
+            result.SetControlWithLabel(title, item);
             treeItem.Items.Add(result);
             return result;
         }

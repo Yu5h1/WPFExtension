@@ -9,29 +9,61 @@ using System.Windows.Input;
 
 namespace Yu5h1Tools.WPFExtension.CustomControls
 {
+    public struct SelectionDialogFilter
+    {
+        public string DisplayName;
+        public string[] types;
+        public SelectionDialogFilter(string displayName, params string[] fileTypes)
+        {
+            DisplayName = displayName;
+            types = fileTypes;
+        }
+        public override string ToString()
+        {
+            string typesTxT = types.Select(d => {
+                var item = d;
+                if (!item.StartsWith("*."))
+                {
+                    if (item.StartsWith(".")) item = "*" + item;
+                    else item = "*." + item;
+                }
+                return item;
+            }).Join("; ");
+            return DisplayName + "(" + typesTxT + ")|" + typesTxT;
+        }
+    }
     /// <summary>
     /// Interaction logic for PathSelector.xaml
     /// </summary>
     public partial class PathSelector : UserControl
     {
+        public Label labelControl => label_lb;
         [Category("PathSelector")]
         public string label
         {
             get { return label_lb.Content as string; }
             set { label_lb.Content = value; }
         }
+
+        [Category("PathSelector")]
+        public double labelWidth
+        {
+            get => label_column.Width.Value;
+            set => label_column.Width = new GridLength(value, GridUnitType.Pixel);
+        }
+
+        public Func<string, string> GetPathBy;
+        public Func<string, string> SetPathBy;
+
         /// <summary>
         /// Image files (*.png;*.jpg;*.gif;*.jpeg)|*.png;*.jpg;*.gif;*.jpeg|All files (*.*)|*.*
         /// </summary>
         [Category("PathSelector")]
         public string Text
         {
-            get { return textBox.Text; }
-
-            set { textBox.Text = DisplayFileNameOnly ? Path.GetFileName(value) : value; }
+            get => GetPathBy == null ? autoCompleteBox.Text : GetPathBy(autoCompleteBox.Text);
+            set => autoCompleteBox.Text = SetPathBy == null ? value : SetPathBy(value);
         }
-        [Category("PathSelector")]
-        public bool DisplayFileNameOnly { get; set; } = false;
 
         [Category("PathSelector")]
         public string FileFilter { get; set; } = "Image files (*.png;*.jpg;*.gif;*.jpeg)|*.png;*.jpg;*.gif;*.jpeg|All files (*.*)|*.*";
@@ -39,35 +71,52 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
         [Category("PathSelector")]
         public string InitialDirectory { get; set; }
 
-        public string[] DropTypesArray { get { return GetTypesArray(FileFilter); } }
+        [Category("PathSelector")]
+        public bool UseAutoComplete{ get; set; }
+
+        public string AutoCompleteLocation = "";
+
+        public bool DisplayFullPath { get; set; }        
 
         public event TextChangedEventHandler TextChanged
         {
-            add { textBox.TextChanged += value; }
-            remove { textBox.TextChanged -= value; }
+            add { autoCompleteBox.TextChanged += value; }
+            remove { autoCompleteBox.TextChanged -= value; }
         }
+
+        public string fileName => Path.GetFileName(Text);        
 
         public PathSelector()
         {
             InitializeComponent();
-            textBox.HandleDragDrop(files => {
-                if (files[0].IsFileTypeMatches(DropTypesArray)) Text = files[0];
-            }, DropTypesArray);
-            textBox.KeyDown += (s, e) => {
-                if (e.Key == Key.Escape) {
-                    textBox.Text = "";
+            Loaded += PathSelector_Loaded;
+            autoCompleteBox.KeyDown += (s, keyEvent) => {
+                if (keyEvent.Key == Key.Escape)
+                {
+                    autoCompleteBox.Text = "";
                     Keyboard.ClearFocus();
                 }
             };
+
         }
-        private void SelectDialog_btn_Click(object sender, RoutedEventArgs e)
+        private void PathSelector_Loaded(object sender, RoutedEventArgs e)
         {
+            autoCompleteBox.HandleDragDrop(files => {
+                Text = files[0];
+            }, GetFileFilters(FileFilter));
+        }
+        public void setFilters(bool AllFile,params SelectionDialogFilter[] filters) {
+            FileFilter = filters.Select(d=>d.ToString()).Join("|");
+            if (AllFile) FileFilter+= "|All files (*.*)|*.*";
+        }
+        public static string ShowOpenFileDialog(bool Multiselect = false,string filePath = "", string fileFilter = "All files (*.*)|*.*", string InitialDirectory = "") {
             // Configure open file dialog box
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            if (!string.Empty.Equals(InitialDirectory)) dlg.InitialDirectory = InitialDirectory;            
-            
-            dlg.FileName = Path.GetFileName(textBox.Text);
-            dlg.Filter = FileFilter;
+            dlg.Multiselect = Multiselect;
+            if (File.Exists(filePath)) dlg.InitialDirectory = Path.GetDirectoryName(filePath);
+            else if (!string.Empty.Equals(InitialDirectory)) dlg.InitialDirectory = InitialDirectory;
+            if (!string.Empty.Equals(filePath)) dlg.FileName = Path.GetFileName(filePath);
+            dlg.Filter = fileFilter;
 
             // Show open file dialog box
             Nullable<bool> result = dlg.ShowDialog();
@@ -76,15 +125,31 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
             if (result == true)
             {
                 // Open document
-                textBox.Text = dlg.FileName;
+                return dlg.FileName;
+            }
+            return "";
+        }
+        private void SelectDialog_btn_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            switch (e.ChangedButton)
+            {
+                case MouseButton.Left:
+                    ShowOpenFileDialog(false,Text,FileFilter,InitialDirectory);
+                    break;
+                case MouseButton.Right:
+                    if (Keyboard.IsKeyDown(Key.LeftCtrl))
+                        ProcessUtil.Launch(Text);
+                    else
+                        ProcessUtil.ShowInExplorer(Text,false);
+                    break;
             }
         }
-        public static string[] GetTypesArray(string filters)
+        public static string[] GetFileFilters(string filters)
         {
             List<string> filterList = filters.Split('|').Where( d => d.Contains("*") &&
                                                                 !d.Contains("(") &&
                                                                 !d.Contains("*.*")).
-                                                                Select(d => d.Replace("*", "")).
+                                                                Select(d => d.Replace("*", "").Replace(" ","")).
                                                                 Join().Split(';').ToList();
             return filterList.ToArray();
         }
@@ -107,5 +172,7 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
                 MessageBox.Show(description, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
+
+
     }
 }

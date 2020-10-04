@@ -19,25 +19,29 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
     /// <summary>
     /// Interaction logic for AautocompleteComboBox2.xaml
     /// </summary>
-    public partial class AautocompleteComboBox : ComboBox
+    public partial class AutocompleteComboBox : ComboBox
     {
         public string[] sourceItems = new string[0];
+        public TextBox textBox => (TextBox)Template.FindName("PART_EditableTextBox", this);
         public event TextChangedEventHandler TextChanged
         {
             add { AddHandler(TextBoxBase.TextChangedEvent, value); }
             remove { RemoveHandler(TextBoxBase.TextChangedEvent, value); }
         }
-
-        public AautocompleteComboBox()
+        private new bool IsEditable {
+            get => base.IsEditable; 
+            set => base.IsEditable = value; 
+        }
+        
+        public AutocompleteComboBox()
         {
             InitializeComponent();
             IsEditable = true;
             IsTextSearchEnabled = false;
-            IsTextSearchEnabled = false;
             TextChanged += OnTextChanged;
             DropDownOpened += (s, ee) =>
             {
-                var tb = (TextBox)Template.FindName("PART_EditableTextBox", this);
+                var tb = textBox;
                 tb.CaretIndex = tb.Text.Length;
             };
             SelectionChanged += AautocompleteComboBox_SelectionChanged;
