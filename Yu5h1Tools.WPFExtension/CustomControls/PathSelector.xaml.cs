@@ -134,7 +134,7 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
             switch (e.ChangedButton)
             {
                 case MouseButton.Left:
-                    ShowOpenFileDialog(false,Text,FileFilter,InitialDirectory);
+                    Text = ShowOpenFileDialog(false,Text,FileFilter,InitialDirectory);
                     break;
                 case MouseButton.Right:
                     if (Keyboard.IsKeyDown(Key.LeftCtrl))
