@@ -19,10 +19,14 @@ namespace Yu5h1Tools.WPFExtension
             uiElement.UpdateLayout();
             uiElement.InvalidateVisual();
         }
-        public static DragEventHandler CheckDrag(string[] filters)
+        static DragEventHandler CheckDragHandler(string[] filters)
         {
             return new DragEventHandler((sender, e) =>
             {
+                if (filters == null || filters.Length == 0) {
+                    e.Handled = true;
+                    return;
+                }
                 var fileDrop = e.Data.GetData(DataFormats.FileDrop);
                 if (fileDrop == null) return;
                 string[] files = (string[])fileDrop;
@@ -32,17 +36,29 @@ namespace Yu5h1Tools.WPFExtension
                     {
                         if (type.ToLower() == "folder" || type.ToLower() == "directory")
                         {
-                            if (File.GetAttributes(files[0]).HasFlag(FileAttributes.Directory)) e.Handled = true;
+                            if (File.GetAttributes(files[0]).HasFlag(FileAttributes.Directory))
+                            {
+                                e.Handled = true;
+                                return;
+                            }
                         }
                     }
-                    if (files[0].IsFileTypeHasAny(filters)) e.Handled = true;
+                    if (files[0].HasAnyFileType(filters)) {
+                        e.Handled = true;
+                        return;
+                    }
+                    
                 }
+                e.Effects = DragDropEffects.None;
+                e.Handled = true;
             });
         }
         public static void HandleDragDrop(this UIElement target,Action<string[]> dropHandle, params string[] filters)
         {
+            var checkDrag = CheckDragHandler(filters);
             target.AllowDrop = true;
-            target.PreviewDragOver += CheckDrag(filters);
+            target.PreviewDragEnter += checkDrag;
+            target.PreviewDragOver += checkDrag;
             target.Drop += new DragEventHandler((s, e) => dropHandle((string[])e.Data.GetData(DataFormats.FileDrop)));
         }  
         internal static bool DisplayTextEquals(this object target, string txt,

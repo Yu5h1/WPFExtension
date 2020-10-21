@@ -15,7 +15,7 @@ namespace Yu5h1Tools.WPFExtension
             Duration = duration;
             Tick += (s, e) =>
             {
-                Console.WriteLine("ticking..."+current.TotalSeconds.ToString());
+                //Console.WriteLine("ticking..."+current.TotalSeconds.ToString());
                 updating?.Invoke(current);
                 if (current.TotalSeconds > Duration)
                 {

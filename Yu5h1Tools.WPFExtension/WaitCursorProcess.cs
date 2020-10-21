@@ -1,20 +1,24 @@
 ﻿using System;
 using System.Windows.Input;
-
+using System.Media;
 namespace Yu5h1Tools.WPFExtension
 {
     public sealed class WaitCursorProcess : IDisposable
     {
-        public bool PlayCompletedSound = false;
-        public WaitCursorProcess(bool playCompletedSound = false)
+        bool PlayCompletedSound = true;
+        public bool succeed = false;
+        public WaitCursorProcess(bool playCompletedSound = true)
         {
             Mouse.OverrideCursor = Cursors.Wait;
             PlayCompletedSound = playCompletedSound;
+            System.Threading.Thread.Sleep(50);
         }
         public void Dispose()
         {
             Mouse.OverrideCursor = Cursors.Arrow;
-            if (PlayCompletedSound) System.Media.SystemSounds.Asterisk.Play();
+            if (PlayCompletedSound) {
+                if (succeed) SystemSounds.Asterisk.Play();
+            } 
         }
     }
 }

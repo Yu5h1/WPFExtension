@@ -62,12 +62,15 @@
     <Compile Include="CustomControls\AdvancedTreeView.xaml.cs">
       <DependentUpon>AdvancedTreeView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="CustomControls\MultiSelectTreeView.cs" />
     <Compile Include="CustomControls\PathSelector.xaml.cs">
       <DependentUpon>PathSelector.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CustomControls\MultiSelectTreeView.xaml.cs">
+      <DependentUpon>MultiSelectTreeView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DatagridEx.cs" />
     <Compile Include="Enums.cs" />
+    <Compile Include="FileTypeFilter.cs" />
     <Compile Include="FrameworkElementEx.cs" />
     <Compile Include="ImageEx.cs" />
     <Compile Include="InformationViewer.cs" />
@@ -82,6 +85,7 @@
     <Compile Include="PanelEx.cs" />
     <Compile Include="PathInfo.cs" />
     <Compile Include="ProcessUtil.cs" />
+    <Compile Include="RegeditUtility.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -120,6 +124,8 @@
     <Compile Include="UIElementEx.cs" />
     <Compile Include="WaitCursorProcess.cs" />
     <Compile Include="Win32Util.cs" />
+    <Compile Include="WindowEx.cs" />
+    <Compile Include="xmlUtil.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -154,16 +160,22 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="CustomControls\MultiSelectTreeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="CustomControls\VisualPoint.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\StretchTreeViewItemStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\numericArror.cur" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Themes\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

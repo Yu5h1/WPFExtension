@@ -9,29 +9,6 @@ using System.Windows.Input;
 
 namespace Yu5h1Tools.WPFExtension.CustomControls
 {
-    public struct SelectionDialogFilter
-    {
-        public string DisplayName;
-        public string[] types;
-        public SelectionDialogFilter(string displayName, params string[] fileTypes)
-        {
-            DisplayName = displayName;
-            types = fileTypes;
-        }
-        public override string ToString()
-        {
-            string typesTxT = types.Select(d => {
-                var item = d;
-                if (!item.StartsWith("*."))
-                {
-                    if (item.StartsWith(".")) item = "*" + item;
-                    else item = "*." + item;
-                }
-                return item;
-            }).Join("; ");
-            return DisplayName + "(" + typesTxT + ")|" + typesTxT;
-        }
-    }
     /// <summary>
     /// Interaction logic for PathSelector.xaml
     /// </summary>
@@ -62,21 +39,40 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
         public string Text
         {
             get => GetPathBy == null ? autoCompleteBox.Text : GetPathBy(autoCompleteBox.Text);
-            set => autoCompleteBox.Text = SetPathBy == null ? value : SetPathBy(value);
+            set {
+                if (!string.IsNullOrEmpty(value) && OnlyAllowValueFromInitialDirectory)
+                {
+                    if (Path.GetPathRoot(value) != "" && !value.ToLower().Contains(InitialDirectory.ToLower()))
+                    {
+                        (value + "\n does not belong to this directory [ " + InitialDirectory + " ]").PromptWarnning();
+                        return;
+                    }
+                }
+                autoCompleteBox.Text = SetPathBy == null ? value : SetPathBy(value);
+            }
         }
 
         [Category("PathSelector")]
         public string FileFilter { get; set; } = "Image files (*.png;*.jpg;*.gif;*.jpeg)|*.png;*.jpg;*.gif;*.jpeg|All files (*.*)|*.*";
 
         [Category("PathSelector")]
-        public string InitialDirectory { get; set; }
+        public string InitialDirectory { get; set; } = "";
+        [Category("PathSelector")]
+        public bool ShowInitialDirectoryIfEmpty { get; set; }
+
+        [Category("PathSelector")]
+        public bool OnlyAllowValueFromInitialDirectory { get; set; }
 
         [Category("PathSelector")]
         public bool UseAutoComplete{ get; set; }
 
+        [Category("PathSelector")]
+        public string InvalidCharacters { get; set; } = ":*?\"<>|";
+
         public string AutoCompleteLocation = "";
 
-        public bool DisplayFullPath { get; set; }        
+        public bool DisplayFullPath { get; set; }
+        
 
         public event TextChangedEventHandler TextChanged
         {
@@ -84,7 +80,9 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
             remove { autoCompleteBox.TextChanged -= value; }
         }
 
-        public string fileName => Path.GetFileName(Text);        
+        public string fileName => Path.GetFileName(Text); 
+        
+        
 
         public PathSelector()
         {
@@ -104,10 +102,10 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
             autoCompleteBox.HandleDragDrop(files => {
                 Text = files[0];
             }, GetFileFilters(FileFilter));
+            AddInvalidCharactersHandler(autoCompleteBox,InvalidCharacters);
         }
-        public void setFilters(bool AllFile,params SelectionDialogFilter[] filters) {
-            FileFilter = filters.Select(d=>d.ToString()).Join("|");
-            if (AllFile) FileFilter+= "|All files (*.*)|*.*";
+        public void setFilters(bool AllFile,params FileTypeFilter[] filters) {
+            FileFilter = filters.ToString(AllFile);
         }
         public static string ShowOpenFileDialog(bool Multiselect = false,string filePath = "", string fileFilter = "All files (*.*)|*.*", string InitialDirectory = "") {
             // Configure open file dialog box
@@ -139,8 +137,15 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
                 case MouseButton.Right:
                     if (Keyboard.IsKeyDown(Key.LeftCtrl))
                         ProcessUtil.Launch(Text);
-                    else
-                        ProcessUtil.ShowInExplorer(Text,false);
+                    else {
+                        string pathForShow = Text;
+                        if (ShowInitialDirectoryIfEmpty && Text == "")
+                        {
+                            pathForShow = InitialDirectory;
+                        }
+                        ProcessUtil.ShowInExplorer(pathForShow);
+                    }
+                        
                     break;
             }
         }
@@ -150,7 +155,7 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
                                                                 !d.Contains("(") &&
                                                                 !d.Contains("*.*")).
                                                                 Select(d => d.Replace("*", "").Replace(" ","")).
-                                                                Join().Split(';').ToList();
+                                                                Join().Split(';').Where(d=>d != "").ToList();
             return filterList.ToArray();
         }
         private void Label_lb_MouseUp(object sender, MouseButtonEventArgs e)
@@ -172,7 +177,31 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
                 MessageBox.Show(description, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
+        public static void CheckInvalidCharactersInput(object s,TextCompositionEventArgs e)
+        {
+            var tb = (TextBox)s;
+            var ttp = tb.ToolTip as ToolTip;
+            string invalidCharacters = (ttp.Content as string).GetLines()[1].Replace(" ","");
+            if (invalidCharacters.Contains(e.Text))
+            {
+                e.Handled = true;
+                tb.ShowToolTip();
+            }
+        }
+        public static void AddInvalidCharactersHandler(TextBox textBox,string invalidCharacters = ":*?\"<>|")
+        {
+            var toolTip = new ToolTip()
+            {
+                Content = "Invalid characters:\n" + invalidCharacters.ToArray().Join(" ").ToString(),
+                
+            };
 
-
+            toolTip.Visibility = Visibility.Hidden;
+            toolTip.Closed += (s, e) => ((ToolTip)s).Visibility = Visibility.Hidden;
+            textBox.ToolTip = toolTip;
+            textBox.PreviewTextInput += CheckInvalidCharactersInput;
+        }
+        public static void RemoveInvalidCharactersHandler(TextBox textBox)
+                                        => textBox.PreviewTextInput -= CheckInvalidCharactersInput;
     }
 }

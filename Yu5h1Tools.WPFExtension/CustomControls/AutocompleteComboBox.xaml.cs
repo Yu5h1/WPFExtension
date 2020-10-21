@@ -32,7 +32,7 @@ namespace Yu5h1Tools.WPFExtension.CustomControls
             get => base.IsEditable; 
             set => base.IsEditable = value; 
         }
-        
+
         public AutocompleteComboBox()
         {
             InitializeComponent();

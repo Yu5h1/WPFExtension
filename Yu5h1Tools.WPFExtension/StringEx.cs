@@ -8,20 +8,30 @@ namespace Yu5h1Tools.WPFExtension
 {
     public static class StringEx
     {
-        public static bool Match(this string txt, string searchText, StringComparison stringComparison = StringComparison.Ordinal)
+        public static bool MatchAny(this string txt, StringComparison stringComparison, params string[] args)
         {
-            if (searchText == "" || searchText == null) return true;
-            return txt.ToLower().IndexOf(searchText.ToLower(), stringComparison) >= 0;
-        }
-        public static bool Match(this string txt, StringComparison stringComparison, params string[] args)
-        {
-            if (args == null || args.Length == 0) return true;
-            foreach (var arg in args) if (txt.Match(arg, stringComparison)) return true;
+            if (args == null || args.Length == 0) return false;
+            foreach (var arg in args)
+                if (txt.Equals(arg, stringComparison)) return true;
             return false;
         }
-        public static bool Match(this string txt,params string[] args)
-                                            => txt.Match(StringComparison.OrdinalIgnoreCase, args);
-        public static bool IsFileTypeHasAny(this string txt, params string[] types)
+        public static bool MatchAny(this string txt, params string[] args)
+                                        => txt.MatchAny(StringComparison.OrdinalIgnoreCase, args);
+        
+        public static bool Contains(this string txt, string searchText, StringComparison stringComparison = StringComparison.Ordinal)
+        {
+            if (searchText == "" || searchText == null) return true;
+            return txt.IndexOf(searchText, stringComparison) >= 0;
+        }
+        public static bool Contains(this string txt, StringComparison stringComparison, params string[] args)
+        {
+            if (args == null || args.Length == 0) return true;
+            foreach (var arg in args) if (txt.Contains(arg, stringComparison)) return true;
+            return false;
+        }
+        public static bool Contains(this string txt,params string[] args) => txt.Contains(StringComparison.OrdinalIgnoreCase, args);
+
+        public static bool HasAnyFileType(this string txt, params string[] types)
         {
             if (txt == "") return false;
             string ext = Path.GetExtension(txt).ToLower();
@@ -79,5 +89,9 @@ namespace Yu5h1Tools.WPFExtension
             }
             return txt;
         }
+        public static string[] GetLines(this string txt) => txt.Split('\n');
+        public static string ToContext(this IEnumerable<string> lines) => lines == null ? "Null" : lines.Join("\n");
+        public static string[] Split(this string txt,string separator, StringSplitOptions options = StringSplitOptions.None) 
+                                                    => txt.Split(new string[] { separator },options);
     }
 }

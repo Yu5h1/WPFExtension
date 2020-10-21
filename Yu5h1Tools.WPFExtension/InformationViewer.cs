@@ -58,7 +58,7 @@ public static class InformationViewer
         MessageBox.Show(content.ToString(), "Warnning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 #endif
     }
-    public static void PromptError(object content)
+    public static void PromptError(this object content)
     {
 #if WPF
         MessageBox.Show(content.ToStringNullCheck(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -66,6 +66,12 @@ public static class InformationViewer
         MessageBox.Show(content.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 #endif
     }
+    public static bool IsFileExistElsePrompt(string path) {
+        if (File.Exists(path)) return true;
+        (path+"\n does not exists ! ").PromptWarnning();
+        return false;
+    }
+
     public static bool IsFileNotLockedElsePrompt(string path)
     {
         var e = PathInfo.GetPathLockedException(path);

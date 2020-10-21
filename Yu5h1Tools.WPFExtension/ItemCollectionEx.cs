@@ -11,9 +11,10 @@ namespace Yu5h1Tools.WPFExtension
     {
         public static object Find(this ItemCollection items, string name)
         {
+            if (items.Count == 0) return null;
             var Hierarchies = name.Split(Path.DirectorySeparatorChar);
             var subPath = Hierarchies.Length > 1 ? name.Substring(name.IndexOf(Path.DirectorySeparatorChar) + 1) : string.Empty;
-            name = Hierarchies.Length > 1 ? name.Remove(name.IndexOf(Path.DirectorySeparatorChar)) : name;
+            name = Hierarchies.Length > 1 ? Hierarchies[0] : name;
             foreach (var item in items)
             {
                 switch (item)

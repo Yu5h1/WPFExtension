@@ -9,14 +9,31 @@ namespace Yu5h1Tools.WPFExtension
     {
         public static MenuItem Create(ItemsControl parent,string itemName,string inputGestureText = "")
         {
+            MenuItem result = null;
             var hierarchies = itemName.Split(Path.DirectorySeparatorChar);
             if (hierarchies.Length > 1) {
-                var root = new MenuItem() { Header = hierarchies[0] };
-                if (parent != null) parent.Items.Add(root);
-                return Create(root, itemName.Substring( itemName.IndexOf(Path.DirectorySeparatorChar) + 1),inputGestureText);
+                if (parent != null)
+                {
+                    for (int i = 0; i < hierarchies.Length - 1; i++)
+                    {
+                        var existsParent = parent.Find(hierarchies[i]) as ItemsControl;
+                        if (existsParent != null) parent = existsParent;
+                        else parent = parent.AddMenuItem(hierarchies[i]);
+                    }
+                    result = new MenuItem() { Header = hierarchies[hierarchies.Length - 1] };
+                    parent.Items.Add(result);
+                } else
+                {
+                    result = Create(new MenuItem() { Header = hierarchies[0] },
+                                   itemName.Substring(itemName.IndexOf(Path.DirectorySeparatorChar) + 1),
+                                   inputGestureText);
+                    parent.Items.Add(result);
+                }
+            }else
+            {
+                result = new MenuItem() { Header = itemName, InputGestureText = inputGestureText };
+                if (parent != null) parent.Items.Add(result);
             }
-            var result = new MenuItem() { Header = itemName ,InputGestureText = inputGestureText};
-            if (parent != null) parent.Items.Add(result);
             return result;
         }
     }

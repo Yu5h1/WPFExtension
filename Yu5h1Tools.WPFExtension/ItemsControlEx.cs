@@ -11,56 +11,57 @@ namespace Yu5h1Tools.WPFExtension
 {
     public static class ItemsControlEx
     {
-        public static TreeViewItem SetTextBlockHeader(this TreeViewItem item, string txt, bool IsHitTestVisible = false)
+        public static TreeViewItem SetHeader<T>(this TreeViewItem item,T control) where T : new()
         {
-            var textBlock = new TextBlock
-            {
-                Text = txt,
-                IsHitTestVisible = IsHitTestVisible
-            };
-            item.Header = textBlock;
+            if (control == null) control = new T();
+            item.Header = control;
             return item;
         }
-        public static TreeViewItem AddTextBlock(this ItemsControl control, string header)
+        public static TreeViewItem SetTextBlockHeader(this TreeViewItem item, string label, bool IsHitTestVisible = false)
         {
-            var result = new TreeViewItem().SetTextBlockHeader(header);
-            control.Items.Add(result);
-            return result;
+            item.SetHeader(new TextBlock
+            {
+                Text = label,
+                IsHitTestVisible = IsHitTestVisible
+            });
+            return item;
         }
         public static T GetHeader<T>(this HeaderedItemsControl item) where T : UIElement => (T)item.Header;
 
-        public static StackPanel CreateMixControls(object title,params UIElement[] controls)
+        public static StackPanel CreateMixControls(object label,params UIElement[] controls)
         {
             var panel = new StackPanel() { Orientation = Orientation.Horizontal };
             foreach (var control in controls) panel.Children.Add(new TextBlock()
             {
-                Text = title.ToString(),
+                Text = label.ToString(),
                 VerticalAlignment = VerticalAlignment.Center,
             }, control);
             return panel;
         }
         public static T GetMixControl<T>(this HeaderedItemsControl item,int index) where T : UIElement
         => (T)((StackPanel)item.Header).Children[index];
+        public static T GetMixControl<T>(this ContentControl item, int index) where T : UIElement
+        => (T)((StackPanel)item.Content).Children[index];
 
-        static StackPanel GetField(object title, object value, double labelWidth = 50, double fieldWidth = 0)
+
+        static StackPanel GetField(object label, object value, double labelWidth = 50, double fieldWidth = 0)
         {
-            return CreateMixControls(title, new TextBox()
+            return CreateMixControls(label, new TextBox()
             {
                 Text = value.ToString(),
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Center,
             });
         }
-        public static O SetControlWithLabel<O, T>(this O item, object title, T control = null,bool LabelRightSide = false)
+        public static O SetControlLabel<O, T>(this O item, object label, T control = null,bool LabelRightSide = false)
                                                 where T : UIElement, new()
                                                 where O : Control
         {
-            var panel = CreateMixControls(title, control == null ? new T() : control);
+            var panel = CreateMixControls(label, control == null ? new T() : control);
             if (LabelRightSide) panel.Switch(0, 1);
             switch (item)
             {
                 case HeaderedItemsControl headeredItemsControl:
-                    
                     headeredItemsControl.Header = panel;
                     break;
                 case ContentControl headeredItemsControl:
@@ -127,9 +128,9 @@ namespace Yu5h1Tools.WPFExtension
             listboxItem.Content = GetNameField(listboxItem, name.ToString(), allowEmpty, OnconfirmModify, fieldWidth);
             return listboxItem;
         }
-        public static TreeViewItem SetField(this TreeViewItem treeItem, object title, object value, double labelWidth = 50, double fieldWidth = 0)
+        public static TreeViewItem SetField(this TreeViewItem treeItem, object label, object value, double labelWidth = 50, double fieldWidth = 0)
         {
-            treeItem.Header = GetField(title, value, labelWidth, fieldWidth);
+            treeItem.Header = GetField(label, value, labelWidth, fieldWidth);
             treeItem.KeyDown += (s, e) =>
             {
                 if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && e.Key == Key.C)
@@ -137,22 +138,27 @@ namespace Yu5h1Tools.WPFExtension
             };
             return treeItem;
         }
-        public static TreeViewItem AddField(this TreeViewItem treeItem, object title, object value, double labelWidth = 50, double fieldWidth = 0)
+        public static TreeViewItem AddField(this TreeViewItem treeItem, object label, object value, double labelWidth = 50, double fieldWidth = 0)
         {
-            var result = new TreeViewItem().SetField(title, value, labelWidth, fieldWidth);
+            var result = new TreeViewItem().SetField(label, value, labelWidth, fieldWidth);
             treeItem.Items.Add(result);
             return result;
         }
-        public static TreeViewItem AddTitleControl<T>(this TreeViewItem treeItem, object title,T item = null)  where T : UIElement,new()
+        public static TreeViewItem AddTreeNode(this TreeViewItem treeItem, object label)
+        {
+            var result = new TreeViewItem() { Header = label };
+            return result;
+        }
+        public static TreeViewItem AddTreeNode<T>(this TreeViewItem treeItem, object label,T item = null)  where T : UIElement,new()
         {
             var result = new TreeViewItem();
-            result.SetControlWithLabel(title, item);
+            result.SetControlLabel(label, item);
             treeItem.Items.Add(result);
             return result;
         }
-        public static ListBoxItem SetField(this ListBoxItem listBoxItem, object title, object value, double labelWidth = 50, double fieldWidth = 0)
+        public static ListBoxItem SetField(this ListBoxItem listBoxItem, object label, object value, double labelWidth = 50, double fieldWidth = 0)
         {
-            listBoxItem.Content = GetField(title, value, labelWidth, fieldWidth);
+            listBoxItem.Content = GetField(label, value, labelWidth, fieldWidth);
             return listBoxItem;
         }
         public static object Find(this ItemsControl itemsControl, string name) => itemsControl.Items.Find(name);       
